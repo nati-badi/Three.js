@@ -3,6 +3,16 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import * as dat from "lil-gui";
 
 /**
+ * Texture
+ */
+const textureLoader = new THREE.TextureLoader();
+const bakedShadow = textureLoader.load("/textures/bakedShadow.jpg");
+// console.log(bakedShadow);
+
+const simpleShadow = textureLoader.load("/textures/simpleShadow.jpg");
+// console.log(simpleShadow);
+
+/**
  * Base
  */
 // Debug
@@ -30,7 +40,7 @@ gui.add(directionalLight.position, "x").min(-5).max(5).step(0.001);
 gui.add(directionalLight.position, "y").min(-5).max(5).step(0.001);
 gui.add(directionalLight.position, "z").min(-5).max(5).step(0.001);
 scene.add(directionalLight);
-directionalLight.castShadow = true;
+directionalLight.castShadow = false;
 
 directionalLight.shadow.mapSize.width = 1024;
 directionalLight.shadow.mapSize.height = 1024;
@@ -51,7 +61,7 @@ scene.add(directionalLightHelper);
 // Spot light
 const spotLight = new THREE.SpotLight(0xffffff, 0.3, 10, Math.PI * 0.3);
 
-spotLight.castShadow = true;
+spotLight.castShadow = false;
 spotLight.shadow.mapSize.width = 1024;
 spotLight.shadow.mapSize.height = 1024;
 spotLight.shadow.camera.fov = 30;
@@ -70,7 +80,7 @@ spotLightCameraHelper.visible = false;
 // Point light
 const pointLight = new THREE.PointLight(0xffffff, 0.3);
 
-pointLight.castShadow = true;
+pointLight.castShadow = false;
 
 pointLight.shadow.mapSize.width = 1024;
 pointLight.shadow.mapSize.height = 1024;
@@ -96,7 +106,7 @@ gui.add(material, "roughness").min(0).max(1).step(0.001);
  * Objects
  */
 const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), material);
-sphere.castShadow = true;
+sphere.castShadow = false;
 
 const plane = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), material);
 plane.rotation.x = -Math.PI * 0.5;
@@ -104,6 +114,18 @@ plane.position.y = -0.5;
 plane.receiveShadow = true;
 
 scene.add(sphere, plane);
+
+const sphereShadow = new THREE.Mesh(
+  new THREE.PlaneGeometry(1.5, 1.5),
+  new THREE.MeshBasicMaterial({
+    color: 0x000000,
+    transparent: true,
+    alphaMap: simpleShadow,
+  })
+);
+sphereShadow.rotation.x = -Math.PI / 2;
+sphereShadow.position.y = plane.position.y + 0.01;
+scene.add(sphereShadow);
 
 /**
  * Sizes
@@ -154,7 +176,7 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
+renderer.shadowMap.enabled = false;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 /**
@@ -164,6 +186,15 @@ const clock = new THREE.Clock();
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
+  // Update the sphere
+  sphere.position.x = Math.cos(elapsedTime) * 1.5;
+  sphere.position.z = Math.sin(elapsedTime) * 1.5;
+  sphere.position.y = Math.abs(Math.sin(elapsedTime * 4));
+
+  // Updating the shadow
+  sphereShadow.position.x = sphere.position.x;
+  sphereShadow.position.z = sphere.position.z;
+  sphereShadow.material.opacity = (1 - sphere.position.y) * 0.6;
 
   // Update controls
   controls.update();
