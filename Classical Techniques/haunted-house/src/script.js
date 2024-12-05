@@ -56,10 +56,10 @@ const grassRoughnessTexture = textureLoader.load(
 // Roof texture
 const roofColorTexture = textureLoader.load("/textures/roof/color.jpg");
 
-grassColorTexture.repeat.set(8, 8);
-grassAmbientOcclusionTexture.repeat.set(8, 8);
-grassNormalTexture.repeat.set(8, 8);
-grassRoughnessTexture.repeat.set(8, 8);
+grassColorTexture.repeat.set(20, 20);
+grassAmbientOcclusionTexture.repeat.set(20, 20);
+grassNormalTexture.repeat.set(20, 20);
+grassRoughnessTexture.repeat.set(20, 20);
 
 grassColorTexture.wrapS = THREE.RepeatWrapping;
 grassNormalTexture.wrapS = THREE.RepeatWrapping;
@@ -201,7 +201,7 @@ for (let i = 0; i < 50; i++) {
 
 // Floor
 const floor = new THREE.Mesh(
-  new THREE.PlaneGeometry(20, 20),
+  new THREE.PlaneGeometry(100, 100),
   new THREE.MeshStandardMaterial({
     map: grassColorTexture,
     aoMap: grassAmbientOcclusionTexture,
@@ -302,7 +302,7 @@ audioLoader.load("/audio/spooky ghost.mp3", function (buffer) {
   backgroundMusic.setBuffer(buffer);
   backgroundMusic.setLoop(true);
   backgroundMusic.setVolume(0.5);
-  // backgroundMusic.play();
+  backgroundMusic.play();
 });
 
 /**
