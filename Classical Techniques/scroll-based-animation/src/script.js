@@ -23,21 +23,32 @@ const canvas = document.querySelector("canvas.webgl");
 // Scene
 const scene = new THREE.Scene();
 
+// Texture
+const textureLoader = new THREE.TextureLoader();
+const gradientTexture = textureLoader.load("/textures/gradients/3.jpg");
+gradientTexture.magFilter = THREE.NearestFilter;
+
 /**
  * Material
  */
 const material = new THREE.MeshToonMaterial({
   color: parameters.materialColor,
+  gradientMap: gradientTexture,
 });
 /**
  * Objects
  */
+const objectsDistance = 4;
 const mesh1 = new THREE.Mesh(new THREE.TorusGeometry(1, 0.4, 16, 60), material);
 const mesh2 = new THREE.Mesh(new THREE.ConeGeometry(1, 2, 32), material);
 const mesh3 = new THREE.Mesh(
   new THREE.TorusKnotGeometry(0.8, 0.35, 100, 16),
   material
 );
+
+mesh1.position.y = -objectsDistance * 0;
+mesh2.position.y = -objectsDistance * 1;
+mesh3.position.y = -objectsDistance * 2;
 
 scene.add(mesh1, mesh2, mesh3);
 
