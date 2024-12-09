@@ -38,7 +38,7 @@ const material = new THREE.MeshToonMaterial({
 /**
  * Objects
  */
-const objectsDistance = 6;
+const objectsDistance = 4;
 const mesh1 = new THREE.Mesh(new THREE.TorusGeometry(1, 0.4, 16, 60), material);
 const mesh2 = new THREE.Mesh(new THREE.ConeGeometry(1, 2, 32), material);
 const mesh3 = new THREE.Mesh(
@@ -49,6 +49,10 @@ const mesh3 = new THREE.Mesh(
 mesh1.position.y = -objectsDistance * 0;
 mesh2.position.y = -objectsDistance * 1;
 mesh3.position.y = -objectsDistance * 2;
+
+mesh1.position.x = 2;
+mesh2.position.x = -2;
+mesh3.position.x = 2;
 
 scene.add(mesh1, mesh2, mesh3);
 
@@ -93,7 +97,11 @@ const camera = new THREE.PerspectiveCamera(
   100
 );
 camera.position.z = 6;
-scene.add(camera);
+
+// Group camera
+const groupCamera = new THREE.Group();
+groupCamera.add(camera);
+scene.add(groupCamera);
 
 /**
  * Renderer
@@ -116,6 +124,19 @@ window.addEventListener("scroll", () => {
 });
 
 /**
+ * Cursor
+ */
+const cursor = {};
+cursor.x = 0;
+cursor.y = 0;
+
+window.addEventListener("mousemove", (event) => {
+  cursor.x = event.clientX / sizes.width - 0.5;
+  cursor.y = event.clientY / sizes.height - 0.5;
+  // console.log("cursor position", cursor);
+});
+
+/**
  * Animate
  */
 const clock = new THREE.Clock();
@@ -124,7 +145,13 @@ const tick = () => {
   const elapsedTime = clock.getElapsedTime();
 
   // Animate camera
-  camera.position.y = -scrollY * 0.008;
+  camera.position.y = (-scrollY / sizes.height) * objectsDistance;
+
+  const parallexX = cursor.x;
+  const parallexY = -cursor.y;
+
+  groupCamera.position.x = parallexX;
+  groupCamera.position.y = parallexY;
 
   // Animates Meshes
   for (const mesh of sectionMeshes) {
