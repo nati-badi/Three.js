@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import * as dat from "lil-gui";
+import gsap from "gsap";
 
 /**
  * Debug
@@ -27,6 +28,7 @@ const scene = new THREE.Scene();
 // Texture
 const textureLoader = new THREE.TextureLoader();
 const gradientTexture = textureLoader.load("/textures/gradients/3.jpg");
+const particleTexture = textureLoader.load("/textures/particles/11.png");
 gradientTexture.magFilter = THREE.NearestFilter;
 
 /**
@@ -84,6 +86,7 @@ const particleMaterial = new THREE.PointsMaterial({
   color: parameters.materialColor,
   sizeAttenuation: true,
   size: 0.03,
+  // alphaMap: particleTexture,
 });
 
 // Particles
@@ -149,10 +152,26 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
  * Scroll
  */
 let scrollY = window.scrollY;
+let currentSection = 0;
 
 window.addEventListener("scroll", () => {
   scrollY = window.scrollY;
-  // console.log("user is scrolling", scrollY);
+
+  const newSection = Math.round(scrollY / sizes.height);
+
+  if (newSection != currentSection) {
+    currentSection = newSection;
+    // console.log("Changed section to", currentSection);
+
+    // animate meshes with section
+    gsap.to(sectionMeshes[currentSection].rotation, {
+      duration: 1.5,
+      ease: "power2.inOut",
+      x: "+=6",
+      y: "+=3",
+      z: "+=1.5",
+    });
+  }
 });
 
 /**
@@ -192,8 +211,8 @@ const tick = () => {
 
   // Animates Meshes
   for (const mesh of sectionMeshes) {
-    mesh.rotation.y = elapsedTime * 0.1;
-    mesh.rotation.x = elapsedTime * 0.12;
+    mesh.rotation.y += deltaTime * 0.1;
+    mesh.rotation.x += deltaTime * 0.12;
   }
 
   // Render
