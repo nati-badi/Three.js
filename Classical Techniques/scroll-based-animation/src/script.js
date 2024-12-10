@@ -12,6 +12,7 @@ const parameters = {
 
 gui.addColor(parameters, "materialColor").onChange(() => {
   material.color.set(parameters.materialColor);
+  particleMaterial.color.set(parameters.materialColor);
 });
 
 /**
@@ -57,6 +58,37 @@ mesh3.position.x = 2;
 scene.add(mesh1, mesh2, mesh3);
 
 const sectionMeshes = [mesh1, mesh2, mesh3];
+
+/**
+ * Particles
+ */
+// Geometry
+const particleCount = 200;
+const positions = new Float32Array(particleCount * 3);
+
+for (let i = 0; i < particleCount; i++) {
+  positions[i * 3 + 0] = (Math.random() - 0.5) * 10;
+  positions[i * 3 + 1] =
+    objectsDistance * 0.5 -
+    Math.random() * objectsDistance * sectionMeshes.length;
+  positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+}
+const particleGeometry = new THREE.BufferGeometry();
+particleGeometry.setAttribute(
+  "position",
+  new THREE.BufferAttribute(positions, 3)
+);
+
+// Material
+const particleMaterial = new THREE.PointsMaterial({
+  color: parameters.materialColor,
+  sizeAttenuation: true,
+  size: 0.03,
+});
+
+// Particles
+const particles = new THREE.Points(particleGeometry, particleMaterial);
+scene.add(particles);
 
 /**
  * Lights
@@ -140,18 +172,23 @@ window.addEventListener("mousemove", (event) => {
  * Animate
  */
 const clock = new THREE.Clock();
+let previousTime = 0;
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
+  const deltaTime = elapsedTime - previousTime;
+  previousTime = elapsedTime;
 
   // Animate camera
   camera.position.y = (-scrollY / sizes.height) * objectsDistance;
 
-  const parallexX = cursor.x;
-  const parallexY = -cursor.y;
+  const parallexX = cursor.x * 0.5;
+  const parallexY = -cursor.y * 0.5;
 
-  groupCamera.position.x = parallexX;
-  groupCamera.position.y = parallexY;
+  groupCamera.position.x +=
+    (parallexX - groupCamera.position.x) * 5 * deltaTime;
+  groupCamera.position.y +=
+    (parallexY - groupCamera.position.y) * 5 * deltaTime;
 
   // Animates Meshes
   for (const mesh of sectionMeshes) {
