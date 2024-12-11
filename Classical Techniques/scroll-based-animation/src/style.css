@@ -5,6 +5,7 @@
 
 html {
   background-color: #1e1a20;
+  scroll-behavior: smooth;
 }
 /* 
 html,
@@ -24,15 +25,53 @@ body
   display: flex;
   align-items: center;
   height: 100vh;
+  width: 100%;
   position: relative;
   font-family: "Cabin", sans-serif;
   color: #ffeded;
-  text-transform: uppercase;
-  font-size: 7vmin;
-  padding-left: 10%;
-  padding-right: 10%;
+  /* text-transform: uppercase; */
+  font-size: 20px;
+  padding-left: 5%;
+  padding-right: 5%;
 }
 
-section:nth-child(odd) {
-  justify-content: flex-end;
+/* Glass Effect */
+.glass {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.4)
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  max-width: 700px; /* Set a max width for the cards */
+  text-align: justify; /* Center-align text inside cards */
+  line-height: 1.2; /* Multiplier of the font size */
+  box-sizing: border-box;
+  padding: 20px; /* Add padding to cards */
+}
+
+.glass > h1 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+.glass > h2 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+.glass > h3 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.glass > p {
+  color: #e4dede;
+}
+
+.box2 {
+  position: absolute;
+  left: 735px;
 }
