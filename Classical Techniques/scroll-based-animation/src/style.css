@@ -41,11 +41,11 @@ body {
     rgba(255, 255, 255, 0.2),
     rgba(255, 255, 255, 0.4)
   );
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.048);
+  box-shadow: 0 8px 32px 0 rgba(202, 201, 201, 0.37);
   max-width: 700px; /* Set a max width for the cards */
   text-align: justify; /* Center-align text inside cards */
   line-height: 1.2; /* Multiplier of the font size */
@@ -73,4 +73,25 @@ body {
 .box2 {
   position: absolute;
   left: 735px;
+}
+
+.effect {
+  font-weight: bold;
+  background: linear-gradient(90deg, #ff7e5f, #feb47b, #6a82fb, #fc5c7d);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientAnimation 3s ease infinite;
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
