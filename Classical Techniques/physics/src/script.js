@@ -38,6 +38,27 @@ const environmentMapTexture = cubeTextureLoader.load([
 const world = new CANNON.World();
 world.gravity.set(0, -9.82, 0);
 
+// Create a sphere
+const sphereShape = new CANNON.Sphere(0.5);
+const sphereBody = new CANNON.Body({
+  mass: 1,
+  position: new CANNON.Vec3(0, 3, 0),
+  shape: sphereShape,
+});
+world.addBody(sphereBody);
+
+// Create a ground plane
+const groundShape = new CANNON.Plane();
+const groundBody = new CANNON.Body({
+  mass: 0,
+});
+groundBody.addShape(groundShape);
+groundBody.quaternion.setFromAxisAngle(
+  new CANNON.Vec3(-1, 0, 0),
+  Math.PI * 0.5
+);
+world.addBody(groundBody);
+
 /**
  * Test Sphere
  */
@@ -48,7 +69,7 @@ const sphereMaterial = new THREE.MeshStandardMaterial({
 const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 scene.add(sphere);
 
-sphere.position.set(0, 0.5, 0);
+sphere.position.set(0, 3, 0);
 
 /**
  * Floor
@@ -138,9 +159,17 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
  * Animate
  */
 const clock = new THREE.Clock();
+let oldElapsedTime = 0;
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
+  const deltaTime = elapsedTime - oldElapsedTime;
+  oldElapsedTime = elapsedTime;
+
+  // Update physics
+  world.step(1 / 60, deltaTime, 3);
+
+  sphere.position.copy(sphereBody.position);
 
   // Update controls
   controls.update();
