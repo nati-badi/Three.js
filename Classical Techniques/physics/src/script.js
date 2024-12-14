@@ -7,6 +7,25 @@ import * as CANNON from "cannon-es";
  * Debug
  */
 const gui = new lil.GUI();
+const debugObject = {};
+// sphere
+debugObject.createSphere = () => {
+  createSphere(Math.random() * 0.5, {
+    x: (Math.random() - 0.5) * 10,
+    y: 3,
+    z: (Math.random() - 0.5) * 10,
+  });
+};
+gui.add(debugObject, "createSphere");
+// cube
+debugObject.createCube = () => {
+  createCube(Math.random() * 0.5, {
+    x: (Math.random() - 0.5) * 10,
+    y: 3,
+    z: (Math.random() - 0.5) * 10,
+  });
+};
+gui.add(debugObject, "createCube");
 
 /**
  * Base
@@ -153,20 +172,29 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
  * Utils
  */
 // Three.js body
-const objectsToUpdate = [];
+const sphereToUpdate = [];
+const cubeToUpdate = [];
+
+const sphereGeometry = new THREE.SphereGeometry(1, 20, 20);
+const sphereMaterial = new THREE.MeshStandardMaterial({
+  metalness: 0.3,
+  roughness: 0.4,
+  envMap: environmentMapTexture,
+});
+
+const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+const cubeMaterial = new THREE.MeshStandardMaterial({
+  metalness: 0.3,
+  roughness: 0.4,
+  envMap: environmentMapTexture,
+});
 
 const createSphere = (radius, position) => {
-  const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(radius, 20, 20),
-    new THREE.MeshStandardMaterial({
-      color: 0xaaaaaa,
-      metalness: 0.3,
-      roughness: 0.4,
-      envMap: environmentMapTexture,
-    })
-  );
+  // Three.js object
+  const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
   sphere.castShadow = true;
   sphere.position.copy(position);
+  sphere.scale.set(radius, radius, radius);
   scene.add(sphere);
 
   // Cannon.js body
@@ -181,13 +209,40 @@ const createSphere = (radius, position) => {
   world.addBody(sphereBody);
 
   // Save in object to update
-  objectsToUpdate.push({
+  sphereToUpdate.push({
     mesh: sphere,
     body: sphereBody,
   });
 };
 
+const createCube = (size, position) => {
+  // Three.js object
+  const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+  cube.castShadow = true;
+  cube.position.copy(position);
+  cube.scale.set(size, size, size);
+  scene.add(cube);
+
+  // Cannon.js body
+  const cubeShape = new CANNON.Box(new CANNON.Vec3(size / 2, size / 2));
+  const cubeBody = new CANNON.Body({
+    mass: 1,
+    position: new CANNON.Vec3(0, 3, 0),
+    shape: cubeShape,
+    material: defaultMaterial,
+  });
+  cubeBody.position.copy(position);
+  world.addBody(cubeBody);
+
+  // Save in object to update
+  cubeToUpdate.push({
+    mesh: cube,
+    body: cubeBody,
+  });
+};
+
 createSphere(0.5, { x: 0, y: 3, z: 0 });
+createCube(0.5, { x: 3, y: 3, z: 0 });
 
 /**
  * Animate
@@ -203,7 +258,10 @@ const tick = () => {
   // Update physics
   world.step(1 / 60, deltaTime, 3);
 
-  for (const obj of objectsToUpdate) {
+  for (const obj of sphereToUpdate) {
+    obj.mesh.position.copy(obj.body.position);
+  }
+  for (const obj of cubeToUpdate) {
     obj.mesh.position.copy(obj.body.position);
   }
 
