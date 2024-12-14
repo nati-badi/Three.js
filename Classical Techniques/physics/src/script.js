@@ -53,19 +53,6 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
 world.addContactMaterial(defaultContactMaterial);
 world.defaultContactMaterial = defaultContactMaterial;
 
-// Create a sphere
-const sphereShape = new CANNON.Sphere(0.5);
-const sphereBody = new CANNON.Body({
-  mass: 1,
-  position: new CANNON.Vec3(0, 3, 0),
-  shape: sphereShape,
-});
-sphereBody.applyLocalForce(
-  new CANNON.Vec3(150, 0, 0),
-  new CANNON.Vec3(0, 0, 0)
-);
-world.addBody(sphereBody);
-
 // Create a ground plane
 const groundShape = new CANNON.Plane();
 const groundBody = new CANNON.Body({
@@ -77,18 +64,6 @@ groundBody.quaternion.setFromAxisAngle(
   Math.PI * 0.5
 );
 world.addBody(groundBody);
-
-/**
- * Test Sphere
- */
-const sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-const sphereMaterial = new THREE.MeshStandardMaterial({
-  color: "#ffffff",
-});
-const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-scene.add(sphere);
-sphere.castShadow = true;
-sphere.position.set(0, 3, 0);
 
 /**
  * Floor
@@ -175,6 +150,46 @@ renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 /**
+ * Utils
+ */
+// Three.js body
+const objectsToUpdate = [];
+
+const createSphere = (radius, position) => {
+  const sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(radius, 20, 20),
+    new THREE.MeshStandardMaterial({
+      color: 0xaaaaaa,
+      metalness: 0.3,
+      roughness: 0.4,
+      envMap: environmentMapTexture,
+    })
+  );
+  sphere.castShadow = true;
+  sphere.position.copy(position);
+  scene.add(sphere);
+
+  // Cannon.js body
+  const sphereShape = new CANNON.Sphere(radius);
+  const sphereBody = new CANNON.Body({
+    mass: 1,
+    position: new CANNON.Vec3(0, 3, 0),
+    shape: sphereShape,
+    material: defaultMaterial,
+  });
+  sphereBody.position.copy(position);
+  world.addBody(sphereBody);
+
+  // Save in object to update
+  objectsToUpdate.push({
+    mesh: sphere,
+    body: sphereBody,
+  });
+};
+
+createSphere(0.5, { x: 0, y: 3, z: 0 });
+
+/**
  * Animate
  */
 const clock = new THREE.Clock();
@@ -188,7 +203,9 @@ const tick = () => {
   // Update physics
   world.step(1 / 60, deltaTime, 3);
 
-  sphere.position.copy(sphereBody.position);
+  for (const obj of objectsToUpdate) {
+    obj.mesh.position.copy(obj.body.position);
+  }
 
   // Update controls
   controls.update();
