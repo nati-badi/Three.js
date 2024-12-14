@@ -38,6 +38,21 @@ const environmentMapTexture = cubeTextureLoader.load([
 const world = new CANNON.World();
 world.gravity.set(0, -9.82, 0);
 
+// Materials
+// const concreteMaterial = new CANNON.Material("concrete");
+// const plasticMaterial = new CANNON.Material("plastic");
+const defaultMaterial = new CANNON.Material("default");
+const defaultContactMaterial = new CANNON.ContactMaterial(
+  defaultMaterial,
+  defaultMaterial,
+  {
+    friction: 0.1,
+    restitution: 0.7,
+  }
+);
+world.addContactMaterial(defaultContactMaterial);
+world.defaultContactMaterial = defaultContactMaterial;
+
 // Create a sphere
 const sphereShape = new CANNON.Sphere(0.5);
 const sphereBody = new CANNON.Body({
@@ -45,6 +60,10 @@ const sphereBody = new CANNON.Body({
   position: new CANNON.Vec3(0, 3, 0),
   shape: sphereShape,
 });
+sphereBody.applyLocalForce(
+  new CANNON.Vec3(150, 0, 0),
+  new CANNON.Vec3(0, 0, 0)
+);
 world.addBody(sphereBody);
 
 // Create a ground plane
@@ -68,7 +87,7 @@ const sphereMaterial = new THREE.MeshStandardMaterial({
 });
 const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 scene.add(sphere);
-
+sphere.castShadow = true;
 sphere.position.set(0, 3, 0);
 
 /**
