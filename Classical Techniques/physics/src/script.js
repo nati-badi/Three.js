@@ -11,9 +11,9 @@ const debugObject = {};
 // sphere
 debugObject.createSphere = () => {
   createSphere(Math.random() * 0.5, {
-    x: (Math.random() - 0.5) * 10,
+    x: (Math.random() - 0.5) * 3,
     y: 3,
-    z: (Math.random() - 0.5) * 10,
+    z: (Math.random() - 0.5) * 3,
   });
 };
 gui.add(debugObject, "createSphere");
@@ -21,9 +21,9 @@ gui.add(debugObject, "createSphere");
 // cube
 debugObject.createCube = () => {
   createCube(Math.random() * 0.5, Math.random() * 0.5, Math.random() * 0.5, {
-    x: (Math.random() - 0.5) * 10,
+    x: (Math.random() - 0.5) * 3,
     y: 3,
-    z: (Math.random() - 0.5) * 10,
+    z: (Math.random() - 0.5) * 3,
   });
 };
 gui.add(debugObject, "createCube");
@@ -36,6 +36,16 @@ const canvas = document.querySelector("canvas.webgl");
 
 // Scene
 const scene = new THREE.Scene();
+
+/**
+ * Sounds
+ */
+const hitSound = new Audio("/sounds/hit.mp3");
+
+const playHitSound = () => {
+  hitSound.currentTime = 0;
+  hitSound.play();
+};
 
 /**
  * Textures
@@ -56,6 +66,8 @@ const environmentMapTexture = cubeTextureLoader.load([
  * Physics
  */
 const world = new CANNON.World();
+world.broadphase = new CANNON.SAPBroadphase(world);
+world.allowSleep = true;
 world.gravity.set(0, -9.82, 0);
 
 // Materials
@@ -231,6 +243,7 @@ const createCube = (width, height, depth, position) => {
     material: defaultMaterial,
   });
   cubeBody.position.copy(position);
+  cubeBody.addEventListener("collide", playHitSound);
   world.addBody(cubeBody);
 
   // Save in object to update
