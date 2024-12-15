@@ -17,9 +17,10 @@ debugObject.createSphere = () => {
   });
 };
 gui.add(debugObject, "createSphere");
+
 // cube
 debugObject.createCube = () => {
-  createCube(Math.random() * 0.5, {
+  createCube(Math.random() * 0.5, Math.random() * 0.5, Math.random() * 0.5, {
     x: (Math.random() - 0.5) * 10,
     y: 3,
     z: (Math.random() - 0.5) * 10,
@@ -172,26 +173,21 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
  * Utils
  */
 // Three.js body
-const sphereToUpdate = [];
-const cubeToUpdate = [];
+const objectsToUpdate = [];
 
 const sphereGeometry = new THREE.SphereGeometry(1, 20, 20);
-const sphereMaterial = new THREE.MeshStandardMaterial({
+const Material = new THREE.MeshStandardMaterial({
   metalness: 0.3,
   roughness: 0.4,
   envMap: environmentMapTexture,
 });
 
 const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-const cubeMaterial = new THREE.MeshStandardMaterial({
-  metalness: 0.3,
-  roughness: 0.4,
-  envMap: environmentMapTexture,
-});
 
+// Create sphere
 const createSphere = (radius, position) => {
   // Three.js object
-  const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+  const sphere = new THREE.Mesh(sphereGeometry, Material);
   sphere.castShadow = true;
   sphere.position.copy(position);
   sphere.scale.set(radius, radius, radius);
@@ -209,22 +205,25 @@ const createSphere = (radius, position) => {
   world.addBody(sphereBody);
 
   // Save in object to update
-  sphereToUpdate.push({
+  objectsToUpdate.push({
     mesh: sphere,
     body: sphereBody,
   });
 };
 
-const createCube = (size, position) => {
+// Create cube
+const createCube = (width, height, depth, position) => {
   // Three.js object
-  const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+  const cube = new THREE.Mesh(cubeGeometry, Material);
   cube.castShadow = true;
   cube.position.copy(position);
-  cube.scale.set(size, size, size);
+  cube.scale.set(width, height, depth);
   scene.add(cube);
 
   // Cannon.js body
-  const cubeShape = new CANNON.Box(new CANNON.Vec3(size / 2, size / 2));
+  const cubeShape = new CANNON.Box(
+    new CANNON.Vec3(width / 2, height / 2, depth / 2)
+  );
   const cubeBody = new CANNON.Body({
     mass: 1,
     position: new CANNON.Vec3(0, 3, 0),
@@ -235,14 +234,14 @@ const createCube = (size, position) => {
   world.addBody(cubeBody);
 
   // Save in object to update
-  cubeToUpdate.push({
+  objectsToUpdate.push({
     mesh: cube,
     body: cubeBody,
   });
 };
 
 createSphere(0.5, { x: 0, y: 3, z: 0 });
-createCube(0.5, { x: 3, y: 3, z: 0 });
+createCube(0.5, 0.5, 0.5, { x: 3, y: 3, z: 0 });
 
 /**
  * Animate
@@ -258,11 +257,9 @@ const tick = () => {
   // Update physics
   world.step(1 / 60, deltaTime, 3);
 
-  for (const obj of sphereToUpdate) {
+  for (const obj of objectsToUpdate) {
     obj.mesh.position.copy(obj.body.position);
-  }
-  for (const obj of cubeToUpdate) {
-    obj.mesh.position.copy(obj.body.position);
+    obj.mesh.quaternion.copy(obj.body.quaternion);
   }
 
   // Update controls
