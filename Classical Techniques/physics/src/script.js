@@ -28,6 +28,21 @@ debugObject.createCube = () => {
 };
 gui.add(debugObject, "createCube");
 
+debugObject.reset = () => {
+  objectsToUpdate.forEach((obj) => {
+    // Remove from physics
+    world.removeBody(obj.body);
+    obj.body.removeEventListener("collide", playHitSound);
+
+    // Remove from Three.js
+    scene.remove(obj.mesh);
+
+    objectsToUpdate.splice(0, objectsToUpdate.length);
+  });
+  objectsToUpdate.length = 0;
+};
+gui.add(debugObject, "reset");
+
 /**
  * Base
  */
@@ -42,7 +57,22 @@ const scene = new THREE.Scene();
  */
 const hitSound = new Audio("/sounds/hit.mp3");
 
-const playHitSound = () => {
+const playHitSound = (cubeBody) => {
+  // Calculate the size of the mesh based on its dimensions
+  const size = Math.max(cubeBody.height, cubeBody.width, cubeBody.depth); // Use the largest dimension
+
+  // Assign volume based on size
+  if (size > 2) {
+    hitSound.volume = 1.0; // Loud for large objects
+  } else if (size > 1) {
+    hitSound.volume = 0.7; // Medium-loud for moderately large objects
+  } else if (size > 0.5) {
+    hitSound.volume = 0.4; // Medium volume for smaller objects
+  } else {
+    hitSound.volume = 0.1; // Quiet for very small objects
+  }
+
+  // Reset and play the sound
   hitSound.currentTime = 0;
   hitSound.play();
 };
@@ -214,6 +244,7 @@ const createSphere = (radius, position) => {
     material: defaultMaterial,
   });
   sphereBody.position.copy(position);
+  sphereBody.addEventListener("collide", playHitSound);
   world.addBody(sphereBody);
 
   // Save in object to update
