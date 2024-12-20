@@ -64,6 +64,16 @@ window.addEventListener("resize", () => {
 });
 
 /**
+ * Mouse
+ */
+const mouse = new THREE.Vector2();
+
+window.addEventListener("mousemove", (event) => {
+  mouse.x = (event.clientX / sizes.width) * 2 - 1;
+  mouse.y = -(event.clientY / sizes.height) * 2 + 1;
+});
+
+/**
  * Camera
  */
 // Base camera
@@ -94,6 +104,9 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
  */
 const clock = new THREE.Clock();
 
+// witness
+let curentIntersect = null;
+
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
 
@@ -103,20 +116,29 @@ const tick = () => {
   object3.position.y = Math.sin(elapsedTime * 1.4) * 1.5;
 
   // Cast a ray
-  const rayOrigin = new THREE.Vector3(-3, 0, 0);
-  const rayDirection = new THREE.Vector3(1, 0, 0);
-  rayDirection.normalize();
-
-  raycaster.set(rayOrigin, rayDirection);
   const intersects = raycaster.intersectObjects([object1, object2, object3]);
-  //   console.log(intersects);
+
+  raycaster.setFromCamera(mouse, camera);
 
   for (const object of [object1, object2, object3]) {
     object.material.color.set(0xff0000);
+
+    if (intersects.find((intersect) => intersect.object === object)) {
+      object.material.color.set(0x00ff00);
+    }
   }
 
-  for (const intersect of intersects) {
-    intersect.object.material.color.set(0x0000ff);
+  // Update mouse enter and leave events
+  if (intersects.length) {
+    if (curentIntersect == null) {
+      console.log("enter");
+    }
+    curentIntersect = intersects[0];
+  } else {
+    if (curentIntersect) {
+      console.log("leave");
+    }
+    curentIntersect = null;
   }
 
   // Update controls
