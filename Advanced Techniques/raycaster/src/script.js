@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import * as dat from "lil-gui";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 /**
  * Base
@@ -13,6 +14,10 @@ const canvas = document.querySelector("canvas.webgl");
 
 // Scene
 const scene = new THREE.Scene();
+
+// Light
+const AmbientLight = new THREE.AmbientLight(0xffffff, 1);
+scene.add(AmbientLight);
 
 /**
  * Objects
@@ -73,6 +78,22 @@ window.addEventListener("mousemove", (event) => {
   mouse.y = -(event.clientY / sizes.height) * 2 + 1;
 });
 
+window.addEventListener("click", (event) => {
+  if (curentIntersect) {
+    switch (curentIntersect.object) {
+      case object1:
+        console.log("object 1 is clicked");
+        break;
+      case object2:
+        console.log("object 2 is clicked");
+        break;
+      case object3:
+        console.log("object 3 is clicked");
+        break;
+    }
+  }
+});
+
 /**
  * Camera
  */
@@ -100,6 +121,20 @@ renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 /**
+ * Models
+ */
+const glTFloader = new GLTFLoader();
+
+// Duck
+let Duck = null;
+
+glTFloader.load("/models/Duck/glTF-Binary/Duck.glb", (gltf) => {
+  Duck = gltf.scene;
+  scene.add(Duck);
+  Duck.position.z = -3;
+});
+
+/**
  * Animate
  */
 const clock = new THREE.Clock();
@@ -117,6 +152,16 @@ const tick = () => {
 
   // Cast a ray
   const intersects = raycaster.intersectObjects([object1, object2, object3]);
+  if (Duck) {
+    const DuckIntersects = raycaster.intersectObject(Duck);
+
+    // Increase the size of the duck if hovered over
+    if (DuckIntersects.length) {
+      Duck.scale.set(1.5, 1.5, 1.5);
+    } else {
+      Duck.scale.set(1, 1, 1);
+    }
+  }
 
   raycaster.setFromCamera(mouse, camera);
 
