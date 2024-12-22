@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import * as lil from "lil-gui";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-// import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
 /**
  * Base
@@ -19,21 +19,21 @@ const scene = new THREE.Scene();
 /**
  * Models
  */
-// const dracoLoader = new DRACOLoader();
-// dracoLoader.setDecoderPath("/draco/");
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath("/draco/");
 
-// const gltfLoader = new GLTFLoader();
-// gltfLoader.setDRACOLoader(dracoLoader);
+const gltfLoader = new GLTFLoader();
+gltfLoader.setDRACOLoader(dracoLoader);
 
 let mixer = null;
 
 gltfLoader.load("/models/Fox/glTF/Fox.gltf", (gltf) => {
   mixer = new THREE.AnimationMixer(gltf.scene);
-  const action = mixer.clipAction(gltf.animations[0]);
+  const action = mixer.clipAction(gltf.animations[2]);
 
   action.play();
 
-  gltf.scene.scale.set(0.03, 0.03, 0.03);
+  gltf.scene.scale.set(0.02, 0.02, 0.02);
   scene.add(gltf.scene);
 });
 
