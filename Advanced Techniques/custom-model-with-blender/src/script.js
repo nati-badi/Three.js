@@ -50,7 +50,7 @@ scene.add(floor);
 const sphere = new THREE.Mesh(
   new THREE.BoxGeometry(3, 3, 3),
   new THREE.MeshStandardMaterial({
-    color: "#ffffff",
+    color: "#18ccff",
     metalness: 0,
     roughness: 0.5,
   })
