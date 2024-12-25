@@ -46,19 +46,6 @@ floor.receiveShadow = true;
 floor.rotation.x = -Math.PI * 0.5;
 scene.add(floor);
 
-// Sphere
-const sphere = new THREE.Mesh(
-  new THREE.BoxGeometry(3, 3, 3),
-  new THREE.MeshStandardMaterial({
-    color: "#18ccff",
-    metalness: 0,
-    roughness: 0.5,
-  })
-);
-
-scene.add(sphere);
-sphere.position.set(0, 6, 0);
-
 /**
  * Lights
  */
@@ -141,10 +128,6 @@ const tick = () => {
   if (mixer) {
     mixer.update(deltaTime);
   }
-
-  // Update sphere
-  sphere.rotation.x += 0.01;
-  sphere.rotation.z += 0.01;
 
   // Update controls
   controls.update();
