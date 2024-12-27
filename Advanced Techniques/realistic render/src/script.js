@@ -32,7 +32,7 @@ const updateAllMaterials = () => {
       child instanceof THREE.Mesh &&
       child.material instanceof THREE.MeshStandardMaterial
     ) {
-      child.material.envMap = environmentMap;
+      // child.material.envMap = environmentMap;
       child.material.envMapIntensity = debugObject.envMapIntensity;
     }
   });
@@ -49,7 +49,9 @@ const environmentMap = cubeTextureLoader.load([
   "/textures/environmentMaps/0/pz.jpg",
   "/textures/environmentMaps/0/nz.jpg",
 ]);
+environmentMap.encoding = THREE.sRGBEncoding;
 scene.background = environmentMap;
+scene.environment = environmentMap;
 
 debugObject.envMapIntensity = 2.5;
 gui
@@ -157,10 +159,23 @@ controls.enableDamping = true;
  */
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
+  antialias: true,
 });
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.physicallyCorrectLights = true;
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ReinhardToneMapping;
+renderer.toneMappingExposure = 1.3;
+
+gui.add(renderer, "toneMapping", {
+  No: THREE.NoToneMapping,
+  "ACES Filmic": THREE.ACESFilmicToneMapping,
+  Reinhard: THREE.ReinhardToneMapping,
+  Cineon: THREE.CineonToneMapping,
+  Linear: THREE.LinearToneMapping,
+});
+gui.add(renderer, "toneMappingExposure").min(0).max(10).step(0.001);
 
 /**
  * Animate
