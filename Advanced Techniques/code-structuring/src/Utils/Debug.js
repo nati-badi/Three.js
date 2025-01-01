@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import * as lil from "lil-gui";
 
 export default class DebugUI {
