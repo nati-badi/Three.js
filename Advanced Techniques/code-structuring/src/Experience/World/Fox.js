@@ -43,7 +43,7 @@ export default class Fox {
       this.resource.animations[0]
     );
     this.animation.actions.walking = this.animation.mixer.clipAction(
-      this.resource.animations[0]
+      this.resource.animations[1]
     );
     this.animation.actions.running = this.animation.mixer.clipAction(
       this.resource.animations[2]
