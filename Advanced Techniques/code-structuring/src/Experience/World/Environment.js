@@ -6,6 +6,12 @@ export default class Environment {
     this.experience = new Experience();
     this.scene = this.experience.scene;
     this.resources = this.experience.resources;
+    this.debug = this.experience.debug;
+
+    // Debug
+    if (this.debug.active) {
+      this.debugFolder = this.debug.ui.addFolder("Environment"); // Add folder to debug ui
+    }
 
     this.setSunLight();
     this.setEnvironmentMap();
@@ -42,5 +48,13 @@ export default class Environment {
       });
     };
     this.environmentMap.updateMaterials();
+
+    // Debug
+    if (this.debug.active) {
+      this.debugFolder
+        .add(this.environmentMap, "intensity", 0, 4, 0.001)
+        .name("Intensity");
+      this.debugFolder.add(this.environmentMap, "texture").name("Texture");
+    }
   }
 }
