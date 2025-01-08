@@ -65,10 +65,11 @@ export default class Experience {
       if (child instanceof THREE.Mesh) {
         child.geometry.dispose();
 
+        // Loop through material properties
         for (const key in child.material) {
           const value = child.material[key];
 
-          // Test if their is a dispose fucntion
+          // Test if their is a dispose function
           if (value && value.dispose === "function") {
             value.dispose();
           }
