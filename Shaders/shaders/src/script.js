@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import * as dat from "lil-gui";
+import * as lil from "lil-gui";
 import testVertexShader from "./shaders/test/vertex.glsl";
 import testFragmentShader from "./shaders/test/fragment.glsl";
 
@@ -8,7 +8,7 @@ import testFragmentShader from "./shaders/test/fragment.glsl";
  * Base
  */
 // Debug
-const gui = new dat.GUI();
+const gui = new lil.GUI();
 
 // Canvas
 const canvas = document.querySelector("canvas.webgl");
@@ -41,11 +41,28 @@ const material = new THREE.RawShaderMaterial({
   vertexShader: testVertexShader,
   fragmentShader: testFragmentShader,
   side: THREE.DoubleSide,
-  transparent: true,
+  uniforms: {
+    uFrequency: { value: new THREE.Vector2(10, 5) },
+    uTime: { value: 0 },
+  },
 });
+
+gui
+  .add(material.uniforms.uFrequency.value, "x")
+  .min(0)
+  .max(20)
+  .step(0.01)
+  .name("FrequencyX");
+gui
+  .add(material.uniforms.uFrequency.value, "y")
+  .min(0)
+  .max(20)
+  .step(0.01)
+  .name("FrequencyY");
 
 // Mesh
 const mesh = new THREE.Mesh(geometry, material);
+mesh.scale.y = 2 / 3;
 scene.add(mesh);
 
 /**
@@ -103,6 +120,9 @@ const clock = new THREE.Clock();
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
+
+  // Update material
+  material.uniforms.uTime.value = elapsedTime * 5;
 
   // Update controls
   controls.update();
