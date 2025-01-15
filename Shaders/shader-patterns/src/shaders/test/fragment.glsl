@@ -122,6 +122,13 @@ void main()
     // Pattern 31
     // float pi = 3.14159265359;
     
+    // vec2 rotatedUv = rotate(vUv, PI * 0.25, vec2(0.5, 0.5));
+    // float strength = 0.15 / distance(vec2(rotatedUv.x, (rotatedUv.y - 0.5) * 7.0 + 0.5), vec2(0.5, 0.5));
+    // strength *= 0.15 / distance(vec2((rotatedUv.x - 0.5) * 7.0 + 0.5, rotatedUv.y), vec2(0.5, 0.5));
+    
+    // Pattern 32
+    float pi = 3.14159265359;
+    
     vec2 rotatedUv = rotate(vUv, PI * 0.25, vec2(0.5, 0.5));
     float strength = 0.15 / distance(vec2(rotatedUv.x, (rotatedUv.y - 0.5) * 7.0 + 0.5), vec2(0.5, 0.5));
     strength *= 0.15 / distance(vec2((rotatedUv.x - 0.5) * 7.0 + 0.5, rotatedUv.y), vec2(0.5, 0.5));
