@@ -127,11 +127,49 @@ void main()
     // strength *= 0.15 / distance(vec2((rotatedUv.x - 0.5) * 7.0 + 0.5, rotatedUv.y), vec2(0.5, 0.5));
     
     // Pattern 32
-    float pi = 3.14159265359;
+    // float strength = step(0.25 ,distance(vUv, vec2(0.5, 0.5)));
     
-    vec2 rotatedUv = rotate(vUv, PI * 0.25, vec2(0.5, 0.5));
-    float strength = 0.15 / distance(vec2(rotatedUv.x, (rotatedUv.y - 0.5) * 7.0 + 0.5), vec2(0.5, 0.5));
-    strength *= 0.15 / distance(vec2((rotatedUv.x - 0.5) * 7.0 + 0.5, rotatedUv.y), vec2(0.5, 0.5));
+    // Pattern 33
+    // float strength = abs(distance(vUv, vec2(0.5)) - 0.25);
     
+    // Pattern 34
+    // float strength = step(0.01, abs(distance(vUv, vec2(0.5)) - 0.25));
+    
+    // Pattern 35
+    // float strength = 1.0 - (step(0.01, abs(distance(vUv, vec2(0.5)) - 0.25)));
+    
+    // Pattern 36
+    // vec2  wavedUv = vec2(
+    //     vUv.x,
+    //     vUv.y + sin(vUv.x * 30.0) * 0.1
+    // );
+    // float strength = sin(1.0 - (step(0.01, abs(distance(wavedUv, vec2(0.5)) - 0.25))));
+    
+    // Pattern 37
+    // vec2  wavedUv = vec2(
+    //     vUv.x + sin(vUv.y * 30.0) * 0.1,
+    //     vUv.y + sin(vUv.x * 30.0) * 0.1
+    // );
+    // float strength = sin(1.0 - (step(0.01, abs(distance(wavedUv, vec2(0.5)) - 0.25))));
+    
+    // Pattern 38
+    // vec2  wavedUv = vec2(
+    //     vUv.x + sin(vUv.y * 100.0) * 0.1,
+    //     vUv.y + sin(vUv.x * 100.0) * 0.1
+    // );
+    // float strength = sin(1.0 - (step(0.01, abs(distance(wavedUv, vec2(0.5)) - 0.25))));
+    
+    // Pattern 39
+    // float angle = atan(vUv.x, vUv.y);
+    // float strength = angle;
+    
+    // Pattern 40
+    // float angle = atan(vUv.x - 0.5, vUv.y - 0.5);
+    // float strength = angle;
+    
+    // Pattern 41
+    float angle = atan(vUv.x - 0.5, vUv.y - 0.5);
+    float strength = angle;
+
     gl_FragColor = vec4(strength, strength, strength, 1.0);
 }
