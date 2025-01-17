@@ -243,7 +243,32 @@ void main()
     // float strength = 1.0 - (step(0.01, abs(distance(vUv, vec2(0.5)) - radius)));
     
     // Pattern 45
-    float strength = cnoise(vUv * 10.0);
+    // float strength = cnoise(vUv * 10.0);
+    
+    // Pattern 46
+    // float strength = cnoise(vUv * 10.0) * 50.0;
+    // float strength = step(0.0, cnoise(vUv * 10.0) * 50.0);
+    
+    // Pattern 47
+    // float strength = 1.0 - abs(cnoise(vUv * 10.0));
+    
+    // Pattern 48
+    float strength = sin(abs(cnoise(vUv * 10.0)) * 20.0);
+    
+    // Pattern 49
+    // float strength = step(0.9, sin(cnoise(vUv * 10.0) * 20.0));
 
-    gl_FragColor = vec4(strength, strength, strength, 1.0);
+    // Black&White version
+    // gl_FragColor = vec4(strength, strength, strength, 1.0);
+    
+    // Clamp the strength
+    // strength = clamp(strength, 0.0, 1.0);
+
+    // Colored version
+    vec3 uvColor = vec3(vUv, 1.0);
+    vec3 blackColor = vec3(0.0);
+    vec3 mixedColor = mix(blackColor, uvColor, strength);
+    gl_FragColor = vec4(mixedColor, 1.0);
+
+
 }
