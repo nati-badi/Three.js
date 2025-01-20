@@ -24,18 +24,25 @@ const scene = new THREE.Scene();
 const waterGeometry = new THREE.PlaneGeometry(2, 2, 128, 128);
 
 // Color
-debugObject.depthColor = "#0000ff";
-debugObject.surfaceColor = "#8888ff";
+debugObject.depthColor = "#186691";
+debugObject.surfaceColor = "#9bd8ff";
 
 // Material
 const waterMaterial = new THREE.ShaderMaterial({
   vertexShader: waterVertexShader,
   fragmentShader: waterFragmentShader,
   uniforms: {
+    uTime: { value: 0 },
+
     uBigWavesElevation: { value: 0.2 },
     uBigWavesFrequency: { value: new THREE.Vector2(4, 1.5) },
-    uTime: { value: 0 },
     uBigWavesSpeed: { value: 0.75 },
+
+    uDepthColor: { value: new THREE.Color(debugObject.depthColor) },
+    uSurfaceColor: { value: new THREE.Color(debugObject.surfaceColor) },
+
+    uColorOffset: { value: 0.08 },
+    uColorMultiplier: { value: 5 },
   },
   side: THREE.DoubleSide,
 });
@@ -67,6 +74,34 @@ gui
   .max(5)
   .step(0.001)
   .name("uBigWavesSpeed");
+
+gui
+  .addColor(debugObject, "depthColor")
+  .onChange(() => {
+    waterMaterial.uniforms.uDepthColor.value.set(debugObject.depthColor);
+  })
+  .name("Depth Color");
+
+gui
+  .addColor(debugObject, "surfaceColor")
+  .onChange(() => {
+    waterMaterial.uniforms.uSurfaceColor.value.set(debugObject.surfaceColor);
+  })
+  .name("Surface Color");
+
+gui
+  .add(waterMaterial.uniforms.uColorOffset, "value")
+  .min(0)
+  .max(1)
+  .step(0.001)
+  .name("unColorOffset");
+
+gui
+  .add(waterMaterial.uniforms.uColorMultiplier, "value")
+  .min(0)
+  .max(10)
+  .step(0.001)
+  .name("uColorMultiplier");
 
 // Mesh
 const water = new THREE.Mesh(waterGeometry, waterMaterial);
