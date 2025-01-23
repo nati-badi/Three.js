@@ -3,20 +3,47 @@ uniform vec2 uBigWavesFrequency;
 uniform float uTime;
 uniform float uBigWavesSpeed;
 
+uniform float uSmallWavesElevation;
+uniform float uSmallWavesFrequency;
+uniform float uSmallWavesSpeed;
+uniform float uSmallWaveIterations; 
+
 varying float vElevation;
 
 //	Classic Perlin 3D Noise 
 //	by Stefan Gustavson (https://github.com/stegu/webgl-noise)
 //
-vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
-vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
-vec3 fade(vec3 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
+vec3 mod289(vec3 x)
+{
+  return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
 
-float cnoise(vec3 P){
+vec4 mod289(vec4 x)
+{
+  return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 permute(vec4 x)
+{
+  return mod289(((x*34.0)+1.0)*x);
+}
+
+vec4 taylorInvSqrt(vec4 r)
+{
+  return 1.79284291400159 - 0.85373472095314 * r;
+}
+
+vec3 fade(vec3 t) {
+  return t*t*t*(t*(t*6.0-15.0)+10.0);
+}
+
+// Classic Perlin noise
+float cnoise(vec3 P)
+{
   vec3 Pi0 = floor(P); // Integer part for indexing
   vec3 Pi1 = Pi0 + vec3(1.0); // Integer part + 1
-  Pi0 = mod(Pi0, 289.0);
-  Pi1 = mod(Pi1, 289.0);
+  Pi0 = mod289(Pi0);
+  Pi1 = mod289(Pi1);
   vec3 Pf0 = fract(P); // Fractional part for interpolation
   vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
   vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
@@ -28,16 +55,16 @@ float cnoise(vec3 P){
   vec4 ixy0 = permute(ixy + iz0);
   vec4 ixy1 = permute(ixy + iz1);
 
-  vec4 gx0 = ixy0 / 7.0;
-  vec4 gy0 = fract(floor(gx0) / 7.0) - 0.5;
+  vec4 gx0 = ixy0 * (1.0 / 7.0);
+  vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
   gx0 = fract(gx0);
   vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
   vec4 sz0 = step(gz0, vec4(0.0));
   gx0 -= sz0 * (step(0.0, gx0) - 0.5);
   gy0 -= sz0 * (step(0.0, gy0) - 0.5);
 
-  vec4 gx1 = ixy1 / 7.0;
-  vec4 gy1 = fract(floor(gx1) / 7.0) - 0.5;
+  vec4 gx1 = ixy1 * (1.0 / 7.0);
+  vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
   gx1 = fract(gx1);
   vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
   vec4 sz1 = step(gz1, vec4(0.0));
@@ -76,9 +103,11 @@ float cnoise(vec3 P){
   vec3 fade_xyz = fade(Pf0);
   vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
   vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
-  float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
+  float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x);
   return 2.2 * n_xyz;
 }
+
+#pragma glslify: export(cnoise)
 
 void main() {
     vec4 modelPosition = modelMatrix * vec4(position, 1.0);
@@ -89,8 +118,8 @@ void main() {
                     * uBigWavesElevation;
     modelPosition.y = elevation;
 
-    for (float i = 1.0; i <= 3.0; i++) {
-        elevation -= abs(cnoise(vec3(modelPosition.xz * 0.3 * i, uTime * 0.2)) * 0.15 / i);
+    for (float i = 1.0; i <= uSmallWaveIterations; i++) {
+        elevation -= abs(cnoise(vec3(modelPosition.xz * uSmallWavesFrequency * i, uTime * uSmallWavesSpeed)) * uSmallWavesElevation / i);
     }
 
     
