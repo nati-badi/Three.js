@@ -1,13 +1,13 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import * as dat from "lil-gui";
+import * as lil from "lil-gui";
 
 /**
  * Base
  */
 // Debug
-const gui = new dat.GUI();
+const gui = new lil.GUI();
 
 // Canvas
 const canvas = document.querySelector("canvas.webgl");
@@ -77,10 +77,12 @@ const depthMaterial = new THREE.MeshDepthMaterial({
 
 const customUniforms = {
   uTime: { value: 0 },
+  uSpeed: { value: 1.0 },
 };
 
 material.onBeforeCompile = (shader) => {
   shader.uniforms.uTime = customUniforms.uTime;
+  shader.uniforms.uSpeed = customUniforms.uSpeed;
 
   shader.vertexShader = shader.vertexShader.replace(
     "#include <common>",
@@ -88,6 +90,7 @@ material.onBeforeCompile = (shader) => {
       #include <common>
 
       uniform float uTime;
+      uniform float uSpeed;
 
       mat2 get2dRotateMatrix(float _angle) {
         return mat2(cos(_angle), - sin(_angle), sin(_angle), cos(_angle));
@@ -100,7 +103,7 @@ material.onBeforeCompile = (shader) => {
     `
       #include <beginnormal_vertex>
 
-      float angle = (position.y + uTime) * 0.9;
+      float angle = sin((position.y + uTime * uSpeed)) * 0.9;
       mat2 rotateMatrix = get2dRotateMatrix(angle);
 
       objectNormal.xz = rotateMatrix * objectNormal.xz;
@@ -119,6 +122,7 @@ material.onBeforeCompile = (shader) => {
 
 depthMaterial.onBeforeCompile = (shader) => {
   shader.uniforms.uTime = customUniforms.uTime;
+  shader.uniforms.uSpeed = customUniforms.uSpeed;
 
   shader.vertexShader = shader.vertexShader.replace(
     "#include <common>",
@@ -126,6 +130,7 @@ depthMaterial.onBeforeCompile = (shader) => {
       #include <common>
 
       uniform float uTime;
+      uniform float uSpeed;
 
       mat2 get2dRotateMatrix(float _angle) {
         return mat2(cos(_angle), - sin(_angle), sin(_angle), cos(_angle));
@@ -137,12 +142,17 @@ depthMaterial.onBeforeCompile = (shader) => {
     `
         #include <begin_vertex>
 
-        float angle = (position.y + uTime) * 0.9;
+        // uniform float uSpeed;
+
+        float angle = (position.y + uTime * uSpeed) * 0.9;
         mat2 rotateMatrix = get2dRotateMatrix(angle);
 
         transformed.xz = rotateMatrix * transformed.xz;
     `
   );
+
+  // GUI
+  gui.add(customUniforms.uSpeed, "value", 1, 5).name("Speed");
 };
 
 /**
@@ -158,6 +168,10 @@ gltfLoader.load("/models/LeePerrySmith/LeePerrySmith.glb", (gltf) => {
 
   // Update materials
   updateAllMaterials();
+
+  // GUI
+  gui.add(mesh.position, "x", -5, 5).name("Model X");
+  gui.add(mesh.position, "z", -3, 1.07).name("Model Z");
 });
 
 /**
@@ -171,6 +185,8 @@ plane.rotation.y = Math.PI;
 plane.position.y = -5;
 plane.position.z = 5;
 scene.add(plane);
+
+gui.add(plane.position, "y", -5, 5).name("Plane Y");
 
 /**
  * Lights
