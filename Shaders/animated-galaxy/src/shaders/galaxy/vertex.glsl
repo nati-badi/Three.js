@@ -15,7 +15,7 @@ gl_Position = projectionPosition;
 
 
 /**
-gl_PointSize;
+Star's size
 **/
 gl_PointSize = uSize * aScale;
 }
