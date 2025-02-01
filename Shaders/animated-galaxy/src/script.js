@@ -108,7 +108,7 @@ const generateGalaxy = () => {
     vertexShader: galaxyVertexShader,
     fragmentShader: galaxyFragmentShader,
     uniforms: {
-      uSize: { value: 2.0 },
+      uSize: { value: 2.0 * renderer.getPixelRatio() },
     },
   });
 
@@ -128,8 +128,6 @@ const generateGalaxy = () => {
   points = new THREE.Points(geometry, material);
   scene.add(points);
 };
-
-generateGalaxy();
 
 gui
   .add(parameters, "count")
@@ -213,6 +211,11 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+/**
+ * Generate galaxy
+ */
+generateGalaxy();
 
 /**
  * Animate
