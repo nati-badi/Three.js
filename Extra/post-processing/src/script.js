@@ -4,6 +4,11 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as dat from "lil-gui";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { DotScreenPass } from "three/examples/jsm/postprocessing/DotScreenPass.js";
+import { GlitchPass } from "three/examples/jsm/postprocessing/GlitchPass.js";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
+import { RGBShiftShader } from "three/examples/jsm/shaders/RGBShiftShader.js";
+import { GammaCorrectionShader } from "three/examples/jsm/shaders/GammaCorrectionShader.js";
 
 /**
  * Base
@@ -99,6 +104,10 @@ window.addEventListener("resize", () => {
   // Update renderer
   renderer.setSize(sizes.width, sizes.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  // Update Effect Composer
+  effectComposer.setSize(sizes.width, sizes.height);
+  effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
 /**
@@ -143,6 +152,26 @@ effectComposer.setSize(sizes.width, sizes.height);
 
 const renderPass = new RenderPass(scene, camera);
 effectComposer.addPass(renderPass);
+
+// Dot screen effect
+const dotScreenPass = new DotScreenPass();
+dotScreenPass.enabled = false;
+effectComposer.addPass(dotScreenPass);
+
+// Glitch effect
+const glitchPass = new GlitchPass();
+glitchPass.goWild = false;
+glitchPass.enabled = true;
+effectComposer.addPass(glitchPass);
+
+// RGB shift effect
+const rgbShiftPass = new ShaderPass(RGBShiftShader);
+rgbShiftPass.enabled = false;
+effectComposer.addPass(rgbShiftPass);
+
+// Gamma correction effect
+const gammaCorrectionPass = new ShaderPass(GammaCorrectionShader);
+effectComposer.addPass(gammaCorrectionPass);
 
 /**
  * Animate
