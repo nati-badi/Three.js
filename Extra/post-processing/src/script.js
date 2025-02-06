@@ -146,7 +146,13 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 /**
  * Post processing
  */
-const effectComposer = new EffectComposer(renderer);
+// Render Target
+const renderTarget = new THREE.WebGLRenderTarget(800, 600, {
+  // samples: renderer.getPixelRatio() === 1 ? 2 : 0,
+});
+
+// Effect Composer
+const effectComposer = new EffectComposer(renderer, renderTarget);
 effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 effectComposer.setSize(sizes.width, sizes.height);
 
