@@ -149,7 +149,10 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 // Render Target
 const renderTarget = new THREE.WebGLRenderTarget(800, 600, {
   // samples: renderer.getPixelRatio() === 1 ? 2 : 0,
+<<<<<<< HEAD
   
+=======
+>>>>>>> 86c6f456afe2771196b58a0302eee223bc3069f2
 });
 
 // Effect Composer
