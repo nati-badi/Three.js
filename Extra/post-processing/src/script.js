@@ -9,6 +9,8 @@ import { GlitchPass } from "three/examples/jsm/postprocessing/GlitchPass.js";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import { RGBShiftShader } from "three/examples/jsm/shaders/RGBShiftShader.js";
 import { GammaCorrectionShader } from "three/examples/jsm/shaders/GammaCorrectionShader.js";
+import { SMAAPass } from "three/examples/jsm/postprocessing/SMAAPass.js";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 
 /**
  * Base
@@ -148,7 +150,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
  */
 // Render Target
 const renderTarget = new THREE.WebGLRenderTarget(800, 600, {
-  // samples: renderer.getPixelRatio() === 1 ? 2 : 0,
+  samples: renderer.getPixelRatio() === 1 ? 2 : 0,
 });
 
 // Effect Composer
@@ -167,13 +169,87 @@ effectComposer.addPass(dotScreenPass);
 // Glitch effect
 const glitchPass = new GlitchPass();
 glitchPass.goWild = false;
-glitchPass.enabled = true;
+glitchPass.enabled = false;
 effectComposer.addPass(glitchPass);
 
 // RGB shift effect
 const rgbShiftPass = new ShaderPass(RGBShiftShader);
 rgbShiftPass.enabled = false;
 effectComposer.addPass(rgbShiftPass);
+
+// Unreal Bloom effect
+const bloomPass = new UnrealBloomPass();
+bloomPass.enabled = true;
+bloomPass.strength = 0.3;
+bloomPass.radius = 1;
+bloomPass.threshold = 0.6;
+effectComposer.addPass(bloomPass);
+
+gui.add(bloomPass, "enabled");
+gui.add(bloomPass, "strength").min(0).max(2).step(0.001);
+gui.add(bloomPass, "radius").min(0).max(2).step(0.001);
+gui.add(bloomPass, "threshold").min(0).max(1).step(0.001);
+
+// Tint Pass
+const TintShader = {
+  uniforms: {
+    tDiffuse: { value: null },
+    uTint: { value: null },
+  },
+  vertexShader: `
+    varying vec2 vUv;
+
+    void main() {
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      vUv = uv;
+    }
+  `,
+  fragmentShader: `
+    uniform sampler2D tDiffuse;
+    uniform vec3 uTint;
+
+    varying vec2 vUv;
+
+    void main() {
+      vec4 color = texture2D(tDiffuse, vUv);
+      color.rgb += uTint;
+
+      gl_FragColor = color;
+    }
+  `,
+};
+const tintPass = new ShaderPass(TintShader);
+tintPass.enabled = true;
+tintPass.material.uniforms.uTint.value = new THREE.Vector3();
+effectComposer.addPass(tintPass);
+
+gui
+  .add(tintPass.material.uniforms.uTint.value, "x")
+  .min(-1)
+  .max(1)
+  .step(0.001)
+  .name("Tint Red");
+gui
+  .add(tintPass.material.uniforms.uTint.value, "y")
+  .min(-1)
+  .max(1)
+  .step(0.001)
+  .name("Tint Green");
+gui
+  .add(tintPass.material.uniforms.uTint.value, "z")
+  .min(-1)
+  .max(1)
+  .step(0.001)
+  .name("Tint Blue");
+
+// SMAA effect
+if (renderer.getPixelRatio() === 1 && !renderer.capabilities.isWebGL2) {
+  const smaaPass = new SMAAPass();
+  smaaPass.enabled = true;
+  effectComposer.addPass(smaaPass);
+
+  console.log("Using SMAA pass");
+}
 
 // Gamma correction effect
 const gammaCorrectionPass = new ShaderPass(GammaCorrectionShader);
