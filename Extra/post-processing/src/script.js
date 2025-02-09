@@ -248,7 +248,7 @@ if (renderer.getPixelRatio() === 1 && !renderer.capabilities.isWebGL2) {
   smaaPass.enabled = true;
   effectComposer.addPass(smaaPass);
 
-  console.log("Using SMAA pass");
+  console.log("Using SMAA pass for test");
 }
 
 // Gamma correction effect
