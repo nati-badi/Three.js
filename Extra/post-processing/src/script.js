@@ -11,6 +11,10 @@ import { RGBShiftShader } from "three/examples/jsm/shaders/RGBShiftShader.js";
 import { GammaCorrectionShader } from "three/examples/jsm/shaders/GammaCorrectionShader.js";
 import { SMAAPass } from "three/examples/jsm/postprocessing/SMAAPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
+import displacementVertexShader from "./shaders/DisplacementShader/vertex.glsl";
+import displacementFragmentShader from "./shaders/DisplacementShader/fragment.glsl";
+import tintVertexShader from "./shaders/TintShader/vertex.glsl";
+import tintFragmentShader from "./shaders/TintShader/fragment.glsl";
 
 /**
  * Base
@@ -196,32 +200,29 @@ const TintShader = {
     tDiffuse: { value: null },
     uTint: { value: null },
   },
-  vertexShader: `
-    varying vec2 vUv;
-
-    void main() {
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      vUv = uv;
-    }
-  `,
-  fragmentShader: `
-    uniform sampler2D tDiffuse;
-    uniform vec3 uTint;
-
-    varying vec2 vUv;
-
-    void main() {
-      vec4 color = texture2D(tDiffuse, vUv);
-      color.rgb += uTint;
-
-      gl_FragColor = color;
-    }
-  `,
+  vertexShader: tintVertexShader,
+  fragmentShader: tintFragmentShader,
 };
 const tintPass = new ShaderPass(TintShader);
 tintPass.enabled = true;
 tintPass.material.uniforms.uTint.value = new THREE.Vector3();
 effectComposer.addPass(tintPass);
+
+// Displacement Pass
+const DisplacementShader = {
+  uniforms: {
+    tDiffuse: { value: null },
+    uNormalMap: { value: null },
+  },
+  vertexShader: displacementVertexShader,
+  fragmentShader: displacementFragmentShader,
+};
+const displacementPass = new ShaderPass(DisplacementShader);
+displacementPass.material.uniforms.uNormalMap.value = textureLoader.load(
+  "/textures/interfaceNormalMap.png"
+);
+displacementPass.enabled = true;
+effectComposer.addPass(displacementPass);
 
 gui
   .add(tintPass.material.uniforms.uTint.value, "x")
