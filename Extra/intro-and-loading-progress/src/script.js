@@ -6,18 +6,25 @@ import { gsap } from "gsap";
 /**
  * Loaders
  */
+// Loading bar element
+const loadingBar = document.querySelector(".loading-bar");
+
 const loadingManager = new THREE.LoadingManager(
   // Loaded
   () => {
-    gsap.to(overlay.material.uniforms.uOpacity, {
-      value: 0,
-      duration: 3,
-      ease: "power2.inOut",
+    gsap.delayedCall(0.5, () => {
+      gsap.to(overlay.material.uniforms.uOpacity, {
+        value: 0,
+        duration: 3,
+      });
+      loadingBar.classList.add("ended");
+      loadingBar.style.transform = "";
     });
   },
   // Progress
-  () => {
-    console.log("Loading progress...");
+  (itemUrl, itemsLoaded, itemsTotal) => {
+    const progress = itemsLoaded / itemsTotal; // 0 to 1
+    loadingBar.style.transform = `scaleX(${progress})`;
   }
 );
 const gltfLoader = new GLTFLoader(loadingManager);
