@@ -48,16 +48,16 @@ bakedTexture.encoding = THREE.sRGBEncoding;
 const poleLightMaterial = new THREE.MeshBasicMaterial({ color: 0xffffe5 });
 
 // Portal light material (shader)
-const portalLightMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+const portalLightMaterial = new THREE.MeshBasicMaterial({
+  color: 0xffffff,
+  side: THREE.DoubleSide,
+});
 
 /**
  * Model
  */
 gltfLoader.load("portal.glb", (gltf) => {
-  gltf.scene.traverse((child) => {
-    child.material = bakedMaterial;
-  });
-
+  const bakedMesh = gltf.scene.children.find((child) => child.name === "baked");
   const poleLightAMesh = gltf.scene.children.find(
     (child) => child.name === "poleLightA"
   );
@@ -68,6 +68,7 @@ gltfLoader.load("portal.glb", (gltf) => {
     (child) => child.name === "portalLight"
   );
 
+  bakedMesh.material = bakedMaterial;
   poleLightAMesh.material = poleLightMaterial;
   poleLightBMesh.material = poleLightMaterial;
   portalLightMesh.material = portalLightMaterial;
