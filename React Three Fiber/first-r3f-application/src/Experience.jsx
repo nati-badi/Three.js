@@ -11,6 +11,11 @@ export default function Experience() {
 
   useFrame((state, delta) => {
     cubeRef.current.rotation.y += 0.01;
+
+    // const angle = state.clock.elapsedTime * 0.4;
+    // state.camera.position.x = Math.sin(angle) * 8;
+    // state.camera.position.z = Math.cos(angle) * 8;
+    // state.camera.lookAt(0, 0, 0);
   });
 
   return (
