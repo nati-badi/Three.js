@@ -2,11 +2,14 @@ import {
   OrbitControls,
   TransformControls,
   PivotControls,
+  Html,
+  Text,
 } from "@react-three/drei";
 import { useRef } from "react";
 
 export default function Experience() {
   const cube = useRef();
+  const sphere = useRef();
 
   return (
     <>
@@ -22,9 +25,18 @@ export default function Experience() {
         scale={100}
         fixed={true}
       >
-        <mesh position-x={-2}>
+        <mesh ref={sphere} position-x={-2}>
           <sphereGeometry />
           <meshStandardMaterial color="orange" />
+          <Html
+            wrapperClass="label"
+            center
+            position={[1, 1, 0]}
+            distanceFactor={8}
+            occlude={[cube, sphere]}
+          >
+            Badi
+          </Html>
         </mesh>
       </PivotControls>
 
@@ -38,6 +50,10 @@ export default function Experience() {
         <planeGeometry />
         <meshStandardMaterial color="greenyellow" />
       </mesh>
+
+      <Text font="./bangers-v20-latin-regular.woff">
+        I love Three.js and React Three Fiber!
+      </Text>
     </>
   );
 }
