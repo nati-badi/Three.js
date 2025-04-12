@@ -1,14 +1,20 @@
 import { OrbitControls } from "@react-three/drei";
 import { useControls } from "leva";
+import { Perf } from "r3f-perf";
 
 export default function Experience() {
-  const { position, color } = useControls({
+  const { perfVisible } = useControls({ perfVisible: true });
+
+  const { position, color, visible } = useControls({
     position: { value: { x: -2, y: 0 }, step: 0.01, joystick: "invertY" },
     color: "#ff0000",
+    visible: true,
   });
 
   return (
     <>
+      {perfVisible && <Perf position="top-left" />}
+
       <OrbitControls makeDefault />
 
       <directionalLight position={[1, 2, 3]} intensity={1.5} />
@@ -19,7 +25,7 @@ export default function Experience() {
         <meshStandardMaterial color={color} />
       </mesh>
 
-      <mesh position-x={2} scale={1.5}>
+      <mesh position-x={2} scale={1.5} visible={visible}>
         <boxGeometry />
         <meshStandardMaterial color="mediumpurple" />
       </mesh>
